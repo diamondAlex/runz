@@ -4,10 +4,34 @@ home=$(echo ~)
 filename=".runz"
 file=$(find . -maxdepth 1 -name "${filename}")
 
+#looks for command in .runz the runs it
 exec_runner() {
-    echo $file
+    scripts=$(cat ${file})
+    IFS=$'\n'
+    for line in $scripts
+    do
+        if [ ! $# -eq 0 ];
+        then
+            comment=${line:0:1}
+            if [ "$comment" != "#" ];
+            then
+                command=$(printf $line | grep $1)
+                if [ ! -z "$command" ];
+                then
+                    text=$(printf $line | sed 's/"//g')
+                    IFS=':' read scr cmd <<< "$text"
+                    echo ran - $cmd - probably succesfully
+                    eval "${cmd}"
+                fi 
+            fi
+        else
+            echo $line
+        fi
+
+    done
 }
 
+#finds .runz file
 if [ -z "$file" ];
 then
     while [[ !($path == $home) && -z "$file" ]]
@@ -21,9 +45,9 @@ then
     then
         echo "no runner file found"
     else
-        exec_runner 
+        exec_runner $1
     fi
 else
-    exec_runner
+    exec_runner $1
 fi
 
