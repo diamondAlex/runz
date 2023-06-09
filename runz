@@ -1,0 +1,29 @@
+#!/bin/bash
+path=$(pwd)
+home=$(echo ~)
+filename=".runz"
+file=$(find . -maxdepth 1 -name "${filename}")
+
+exec_runner() {
+    echo $file
+}
+
+if [ -z "$file" ];
+then
+    while [[ !($path == $home) && -z "$file" ]]
+    do
+        path=$(echo "${path%/*}")
+        file=$(find "${path}" -maxdepth 1 -type f -name "${filename}")
+        echo "path = ${path}"
+        echo "file = ${file}"
+    done
+    if [ -z "$file" ];
+    then
+        echo "no runner file found"
+    else
+        exec_runner 
+    fi
+else
+    exec_runner
+fi
+
