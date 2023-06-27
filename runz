@@ -25,7 +25,19 @@ exec_runner() {
                 fi 
             fi
         else
-            echo $line
+            comment=${line:0:1}
+            if [ "$comment" != "#" ];
+            then
+                command=$(printf $line)
+                if [ ! -z "$command" ];
+                then
+                    text=$(printf $line | sed 's/"//g')
+                    IFS=':' read scr cmd <<< "$text"
+                    echo ran - $cmd - probably succesfully
+                    eval "${cmd}"
+                fi 
+                break
+            fi
         fi
 
     done
