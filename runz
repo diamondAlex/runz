@@ -43,6 +43,15 @@ exec_runner() {
     done
 }
 
+has_script(){
+    if [ -z "$1"];
+    then
+        cat $file
+    else
+        exec_runner $1
+    fi
+}
+
 #finds .runz file
 if [ -z "$file" ];
 then
@@ -57,9 +66,9 @@ then
     then
         echo "no runner file found"
     else
-        exec_runner $1
+        has_script 
     fi
 else
-    exec_runner $1
+    has_script 
 fi
 
