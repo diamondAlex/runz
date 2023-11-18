@@ -15,28 +15,15 @@ exec_runner() {
             comment=${line:0:1}
             if [ "$comment" != "#" ];
             then
-                command=$(printf $line | grep $1)
+                IFS=':' read -ra comm <<< "$line"
+                command=$(printf $comm | grep -w $1)
                 if [ ! -z "$command" ];
                 then
                     text=$(printf $line | sed 's/"//g')
                     IFS=':' read scr cmd <<< "$text"
                     echo ran - $cmd - probably succesfully
-                    eval "${cmd}"
+                    eval "${cmd}" "$2"
                 fi 
-            fi
-        else
-            comment=${line:0:1}
-            if [ "$comment" != "#" ];
-            then
-                command=$(printf $line)
-                if [ ! -z "$command" ];
-                then
-                    text=$(printf $line | sed 's/"//g')
-                    IFS=':' read scr cmd <<< "$text"
-                    echo ran - $cmd - probably succesfully
-                    eval "${cmd}"
-                fi 
-                break
             fi
         fi
 
@@ -44,11 +31,11 @@ exec_runner() {
 }
 
 has_script(){
-    if [ -z "$1"];
+    if [ -z "$1" ];
     then
         cat $file
     else
-        exec_runner $1
+        exec_runner $1 $2
     fi
 }
 
@@ -66,9 +53,9 @@ then
     then
         echo "no runner file found"
     else
-        has_script 
+        has_script $1 $2
     fi
 else
-    has_script 
+    has_script $1 $2
 fi
 
